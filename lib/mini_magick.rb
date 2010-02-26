@@ -80,8 +80,11 @@ module MiniMagick
     # Formatting an animation into a non-animated type will result in ImageMagick creating multiple
     # pages (starting with 0).  You can choose which page you want to manipulate.  We default to the
     # first page.
-    def format(format, page=0)
-      run_command("mogrify", "-format", format, @path)
+    def format(format, page=0, &block)
+      c = CommandBuilder.new
+      block.call c if block_given?
+      
+      run_command("mogrify", "-format", format, *c.args << @path)
 
       old_path = @path.dup
       @path.sub!(/(\.\w+)?$/, ".#{format}")
